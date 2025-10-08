@@ -1,0 +1,4 @@
+"""
+Pacote de configurações
+"""
+

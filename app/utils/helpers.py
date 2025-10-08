@@ -1,0 +1,5 @@
+"""
+Funções auxiliares e utilitários
+"""
+
+
