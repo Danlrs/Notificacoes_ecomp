@@ -1,3 +1,2 @@
-# Dependências básicas do projeto
-
-
+python-dotenv
+requests
