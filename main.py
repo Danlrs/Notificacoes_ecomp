@@ -19,6 +19,30 @@ from app.services.EmailClassifer import EmailClassifier
 from app.models.EmailData import EmailData
 from app.api.inbox_stream import send_email_to_api
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.services.gmail_imap import fetch_unread_emails
+from app.services.EmailClassifer import EmailClassifier
+from app.api.inbox_stream import send_email_to_api
+import os
+import time
+from dotenv import load_dotenv
+from threading import Thread
+from typing import List
+
+app = FastAPI(
+    title="InboxStream API",
+    version="v1",
+    description="API para ingestão, categorização e notificação em tempo real de e-mails."
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -56,5 +80,15 @@ def main():
     watch_emails(poll_interval_seconds=60)
     pass
 
-if __name__ == "__main__":
-    main()
+@app.on_event("startup")
+async def startup_event():
+    """Inicia o serviço de polling em uma thread separada"""
+    print("🚀 Iniciando o serviço de polling...")
+    thread = Thread(target=get_emails)
+    thread.start()
+
+@app.get("/", tags=["Health"])
+def health_check():
+    return {"status": "ok", "service": "InboxStream API is running!"}
+
+# Para rodar: uvicorn app:app --reload
