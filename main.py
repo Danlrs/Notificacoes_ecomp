@@ -4,6 +4,7 @@ Aplicação principal do sistema de notificações
 """
 # Importações padrão do Python
 import os
+import time
 from typing import List
 from dotenv import load_dotenv
 
@@ -16,6 +17,7 @@ os.chdir(ROOT_DIR)
 from app.services.gmail_imap import fetch_unread_emails
 from app.services.EmailClassifer import EmailClassifier
 from app.models.EmailData import EmailData
+from app.api.inbox_stream import send_email_to_api
 
 
 # Carrega variáveis de ambiente
@@ -29,13 +31,29 @@ def get_emails():
     print("\n📂 Emails classificados:\n")
     for e in classificados:
         categoria = e.get("categoria", "Outros")
+        try:
+            send_email_to_api(e)
+        except Exception as ex:
+            print(f"❌ Falha ao enviar email ID {e['id']} para API: {ex}")
+            continue
         print(f"[{categoria}] {e['subject']}")
         # print(f"De: {e['sender']}")
         # print(f"Prévia: {e['snippet'][:80]}...\n")
 
+def watch_emails(poll_interval_seconds: int = 300):
+    """Polling: busca emails a cada poll_interval_seconds (padrão 300s = 5min)"""
+    print(f"⏱️  Iniciando polling: a cada {poll_interval_seconds} segundos. (Ctrl+C para parar)\n")
+    try:
+        while True:
+            get_emails()
+            time.sleep(poll_interval_seconds)
+    except KeyboardInterrupt:
+        print("\n⛔ Polling interrompido pelo usuário. Saindo...")
+
 def main():
     """Função principal da aplicação"""
-    # get_emails() # Descomente para testar a obtenção e classificação de emails
+    # Inicia polling a cada 1 minuto
+    watch_emails(poll_interval_seconds=60)
     pass
 
 if __name__ == "__main__":
