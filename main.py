@@ -22,13 +22,7 @@ from app.api.inbox_stream import send_email_to_api
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.services.gmail_imap import fetch_unread_emails
-from app.services.EmailClassifer import EmailClassifier
-from app.api.inbox_stream import send_email_to_api
-import os
-import time
-from dotenv import load_dotenv
 from threading import Thread
-from typing import List
 import logging
 
 # --- Configuração de Logging ---

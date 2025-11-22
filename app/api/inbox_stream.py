@@ -17,8 +17,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-API_URL = os.getenv("INBOXSTREAM_API_URL", "http://localhost:8000/emails/")
-TIMEOUT_SECONDS = 6
+API_URL = os.getenv("INBOXSTREAM_API_URL", "http://localhost:8000/api/v1/emails/")
+
+TIMEOUT_SECONDS = 15
 
 
 def _to_iso_utc(date_str: str) -> str:
@@ -47,7 +48,7 @@ def build_payload(email: Dict) -> Dict:
         "id": str(email.get("id") or email.get("message_id") or ""),
         "subject": email.get("subject", ""),
         "body": email.get("body") or email.get("snippet", "") or "",
-        "category": email.get("category", "Geral"),
+        "category": email.get("categoria", "Geral"),
         "date": _to_iso_utc(email.get("date", ""))
     }
 
