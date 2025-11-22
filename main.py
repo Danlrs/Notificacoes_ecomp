@@ -29,6 +29,19 @@ import time
 from dotenv import load_dotenv
 from threading import Thread
 from typing import List
+import logging
+
+# --- Configuração de Logging ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title="InboxStream API",
@@ -52,27 +65,27 @@ def get_emails():
     emails: List[EmailData] = fetch_unread_emails(max_results=2, unread_only=True)
     classifier = EmailClassifier()
     classificados: List[EmailData] = classifier.classify_all(emails)
-    print("\n📂 Emails classificados:\n")
+    logger.info(f"📂 {len(classificados)} emails classificados")
     for e in classificados:
         categoria = e.get("categoria", "Outros")
         try:
             send_email_to_api(e)
+            logger.info(f"✅ Email enviado - Categoria: [{categoria}] Assunto: {e['subject']}")
         except Exception as ex:
-            print(f"❌ Falha ao enviar email ID {e['id']} para API: {ex}")
+            logger.error(f"❌ Falha ao enviar email ID {e['id']} para API: {ex}")
             continue
-        print(f"[{categoria}] {e['subject']}")
         # print(f"De: {e['sender']}")
         # print(f"Prévia: {e['snippet'][:80]}...\n")
 
 def watch_emails(poll_interval_seconds: int = 300):
     """Polling: busca emails a cada poll_interval_seconds (padrão 300s = 5min)"""
-    print(f"⏱️  Iniciando polling: a cada {poll_interval_seconds} segundos. (Ctrl+C para parar)\n")
+    logger.info(f"⏱️  Iniciando polling: a cada {poll_interval_seconds} segundos. (Ctrl+C para parar)\n")
     try:
         while True:
             get_emails()
             time.sleep(poll_interval_seconds)
     except KeyboardInterrupt:
-        print("\n⛔ Polling interrompido pelo usuário. Saindo...")
+        logger.warning("⛔ Polling interrompido pelo usuário. Saindo...")
 
 def main():
     """Função principal da aplicação"""
@@ -83,7 +96,7 @@ def main():
 @app.on_event("startup")
 async def startup_event():
     """Inicia o serviço de polling em uma thread separada"""
-    print("🚀 Iniciando o serviço de polling...")
+    logger.info("🚀 Iniciando o serviço de polling...")
     thread = Thread(target=get_emails)
     thread.start()
 

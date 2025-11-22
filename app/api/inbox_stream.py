@@ -3,8 +3,21 @@ from typing import Dict, List
 from email.utils import parsedate_to_datetime
 import datetime
 import requests
+import logging
+import os
 
-API_URL = "http://localhost:8000/api/v1/emails"
+# --- Configuração de Logging ---
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+API_URL = os.getenv("INBOXSTREAM_API_URL", "http://localhost:8000/emails/")
 TIMEOUT_SECONDS = 6
 
 
