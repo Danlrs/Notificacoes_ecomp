@@ -77,7 +77,7 @@ def get_emails():
         # print(f"De: {e['sender']}")
         # print(f"Prévia: {e['snippet'][:80]}...\n")
 
-def watch_emails(poll_interval_seconds: int = 300):
+def watch_emails(poll_interval_seconds: int = 60):
     """Polling: busca emails a cada poll_interval_seconds (padrão 300s = 5min)"""
     logger.info(f"⏱️  Iniciando polling: a cada {poll_interval_seconds} segundos. (Ctrl+C para parar)\n")
     try:
@@ -87,17 +87,11 @@ def watch_emails(poll_interval_seconds: int = 300):
     except KeyboardInterrupt:
         logger.warning("⛔ Polling interrompido pelo usuário. Saindo...")
 
-def main():
-    """Função principal da aplicação"""
-    # Inicia polling a cada 1 minuto
-    watch_emails(poll_interval_seconds=60)
-    pass
-
 @app.on_event("startup")
 async def startup_event():
     """Inicia o serviço de polling em uma thread separada"""
     logger.info("🚀 Iniciando o serviço de polling...")
-    thread = Thread(target=get_emails)
+    thread = Thread(target=watch_emails, args=(60,), daemon=True)
     thread.start()
 
 @app.get("/", tags=["Health"])
