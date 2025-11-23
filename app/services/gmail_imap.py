@@ -161,7 +161,7 @@ class GmailIMAPReader:
                 labels = msg.get('X-GM-LABELS').split()
             
             # Extrai prévia do corpo
-            snippet = self.get_email_body(msg, preview_only=True)
+            snippet = self.get_email_body(msg, preview_only=False)
             
             return {
                 'id': email_id.decode() if isinstance(email_id, bytes) else str(email_id),
@@ -169,7 +169,7 @@ class GmailIMAPReader:
                 'sender': sender,
                 'date': date_str,
                 'labels': labels,
-                'snippet': snippet[:200]  # Primeiros 200 caracteres
+                'snippet': snippet
             }
             
         except Exception as e:
@@ -195,7 +195,7 @@ class GmailIMAPReader:
         
         return decoded_string
     
-    def get_email_body(self, msg, preview_only=True):
+    def get_email_body(self, msg, preview_only=False):
         """
         Extrai corpo do email
         
