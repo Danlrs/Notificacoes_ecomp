@@ -1,8 +1,7 @@
-# Sistema de Notificações - ECOMP
 
 <img width=100% src="https://capsule-render.vercel.app/api?type=waving&color=3B6790&height=120&section=header"/>
 
-<h1 align="center">Sistema de Notificações Inteligentes</h1>
+<h1 align="center">Sistema de Notificações Inteligente</h1>
 
 <div align="center">  
   <img width=40% src="http://img.shields.io/static/v1?label=STATUS&message=EM%20DESENVOLVIMENTO&color=EFB036&style=for-the-badge"/>
